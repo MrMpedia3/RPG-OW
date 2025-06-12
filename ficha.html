@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Ficha de Personagem - Overwatch RPG</title>
+	<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+	<link href="ficha.css" rel="stylesheet">
+</head>
+
+<body>
+	<div id="yt-player" style="position: fixed; top: 10px; left: 10px; z-index: 999;">
+		<iframe width="300" height="80" src="https://www.youtube.com/embed/videoseries?list=PLV88xPlqiIv_G9KCNsW11RGa_FzJ3hFqq&autoplay=1&loop=1&playlist=PLV88xPlqiIv_G9KCNsW11RGa_FzJ3hFqq" title="Músicas Overwatch" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+	</div>
+	<h1>Ficha de Personagem - Overwatch RPG</h1>
+	<div class="theme-toggle">
+		<button id="temaBtn" onclick="toggleTheme()">🌙 Tema Escuro</button>
+	</div>
+	<div class="tabs">
+		<button class="tab-button active" onclick="showTab('geral')">Geral</button>
+		<button class="tab-button active" onclick="showTab('pessoal')">Pessoal</button>
+		<button class="tab-button" onclick="showTab('habilidades')">Habilidades</button>
+		<button class="tab-button" onclick="showTab('equipamento')">Equipamento</button>
+	</div>
+
+	<!--Esse é o painel de informações gerais do personagem-->
+	<div id="geral" class="tab-content active">
+		<form class="panel">
+			<label>Nome do Personagem: <input type="text" placeholder="Ex: Echo" />
+			</label>
+			<label>Associação: <select>
+					<option>Nenhuma/Civil</option>
+					<option>Overwatch</option>
+					<option>Talon</option>
+					<option>Yokai</option>
+					<option>Hashimoto</option>
+					<option>Shambali</option>
+					<option>Phreaks</option>
+					<option>Junkers</option>
+					<option>Guange Deadlock</option>
+					<option>Setor Nulo</option>
+					<option>Los Muertos</option>
+					<option>Helix Security</option>
+					<option>Vishkar Corporation</option>
+					<option>Lumérico</option>
+					<option>Guilda dos Encouraçados</option>
+					<option>Lucheng Interstellar</option>
+					<option>Industrias Volskaya</option>
+					<option>Cruzados</option>
+					<option>Ministérios</option>
+				</select>
+			</label>
+			<label>Classe: <select>
+					<option>Tank</option>
+					<option>DPS</option>
+					<option>Suporte</option>
+				</select>
+			</label>
+		</form>
+	<div class="panel vida-panel">
+  <h2>Vida</h2>
+  <label>Vida Máxima: <input type="number" id="vidaMaxima" min="1" value="14" /></label>
+  <label>Armadura: <input type="number" id="armaduraMax" min="0" value="4" /></label>
+  <label>Escudo: <input type="number" id="escudoMax" min="0" value="0" /></label>
+
+  <div style="margin-top: 10px">
+  <label for="valorModificador">Valor:</label>
+  <input type="number" id="valorModificador" value="1" min="1" style="width: 60px;">
+
+  <button onclick="aplicarDanoComValor()">Aplicar Dano</button>
+  <button onclick="curarComValor()">Aplicar Cura</button>
+</div>
+
+  <div id="barraDeVida" class="vida-barra"></div>
+</div>
+
+    <div class="panel">
+    <h2>Atributos</h2>
+    <div class="flex-row">
+        <div class="atributo"><label for="vigor">💪 Vigor</label><input id="vigor" type="number" min="-2" max="5" value="0" /></div>
+        <div class="atributo"><label for="mobilidade">🏃 Mobilidade</label><input id="mobilidade" type="number" min="-2" max="5" value="0" /></div>
+        <div class="atributo"><label for="tecnica">⚙ Técnica</label><input id="tecnica" type="number" min="-2" max="5" value="0" /></div>
+        <div class="atributo"><label for="espirito">✨ Espírito</label><input id="espirito" type="number" min="-2" max="5" value="0" /></div>
+        <div class="atributo"><label for="presenca">🎙 Presença</label><input id="presenca" type="number" min="-2" max="5" value="0" /></div>
+    </div>
+</div>
+    <div class="panel">
+      <h2>Suprema</h2>
+      <div class="circle-wrapper">
+        <div class="circle" id="supremaCircle">0%</div>
+      </div>
+      <label>Carga da Suprema (%) <input type="number" id="supremaInput" min="0" max="100" value="0">
+      </label>
+    </div>
+    <div class="panel dice-panel">
+  <h2>Rolar Dados</h2>
+  <div id="dice-result" class="dice-result">🎲</div>
+
+  <label>
+    Notação do dado:
+    <input type="text" id="inputNotacaoDado" placeholder="ex: 2d8+3" style="width: 100px;">
+  </label>
+  <button onclick="rolarDadoCustomizado()">Rolar</button>
+
+  <br>Histórico de rolagens:
+  <div class="dice-log" id="diceLog"></div>
+</div>
+
+	</div>
+
+	<!--Esse é o painel de informações pessoais do personagem-->
+	<div id="pessoal" class="tab-content">
+		<form class="panel">
+			<h2>Informações do agente</h2>
+			<label>Nome completo: <input type="text" placeholder="Ex: Jack Morison" />
+			</label>
+			<label>Apelido ou codinome: <input type="text" placeholder="Ex: Soldier: 76" />
+			</label>
+			<label>Idade: <input type="number" placeholder="Idade" min="0" />
+			</label>
+			<label>Data de nascimento:</label>
+			<div class="flex-row">
+				<input type="number" placeholder="Dia" min="1" max="31" style="width: 60px;" />
+				<input type="number" placeholder="Mês" min="1" max="12" style="width: 60px;" />
+				<input type="number" placeholder="Ano" min="1900" max="2100" style="width: 80px;" />
+			</div>
+			<label>Nacionalidade: <input type="text" placeholder="Ex: Estados Unidos" />
+			</label>
+			<label>Afiliados / Contatos importantes: <input type="text" placeholder="Ex: Ana, Gabriel Reyes, Overwatch" />
+			</label>
+		</form>
+		<div class="panel">
+			<h2>História:</h2>
+			<textarea rows="6" placeholder="Aqui fica a história do seu personagem. Divirta-se e escreva como quiser." style="width: 100%; resize: vertical;"></textarea>
+		</div>
+	</div>
+	<!--Esse é o painel de informações sobre as habilidades do personagem-->
+	<div id="habilidades" class="tab-content">
+		<div class="panel">
+			<h2>Habilidades</h2>
+			<div id="habilidadesContainer">
+				<div class="habilidade">
+					<label>Nome da Habilidade: <input type="text" placeholder="Nome da habilidade">
+					</label>
+					<label>Descrição da Habilidade: <textarea placeholder="Descrição detalhada da habilidade"></textarea>
+					</label>
+					<label>Cooldown (em turnos): <input type="number" placeholder="Cooldown">
+					</label>
+					<button type="button" onclick="removerHabilidade(this)">-</button>
+				</div>
+				<div class="habilidade">
+					<label>Nome da Habilidade: <input type="text" placeholder="Nome da habilidade">
+					</label>
+					<label>Descrição da Habilidade: <textarea placeholder="Descrição detalhada da habilidade."></textarea>
+					</label>
+					<label>Cooldown (em turnos): <input type="number" placeholder="Cooldown">
+					</label>
+					<button type="button" onclick="removerHabilidade(this)">-</button>
+				</div>
+			</div>
+			<button type="button" onclick="adicionarHabilidade()">+</button>
+		</div>
+	</div>
+	<!--Esse é o painel de informações sobre as armas e equipamento do personagem-->
+	<div id="equipamento" class="tab-content">
+		<div class="panel">
+			<h2>Inventário</h2>
+			<textarea rows="4" placeholder="Liste os itens do inventário aqui..."></textarea>
+		</div>
+		<div class="panel">
+			<h2>Armas</h2>
+			<div id="armasContainer">
+				<div class="arma">
+					<label>Nome da Arma: <input type="text" placeholder="Nome da arma">
+					</label>
+					<label>Dano (ex: 1d6, 2d8): <input type="text" placeholder="Dano da arma">
+					</label>
+					<label>Tipo de Dano: <select>
+							<option>Melee</option>
+							<option>Feixe</option>
+							<option>Hitscan</option>
+							<option>Projétil</option>
+						</select>
+					</label>
+					<label>Efeitos Especiais: <textarea placeholder="Descreva efeitos adicionais, se houver."></textarea>
+					</label>
+					<button type="button" onclick="removerArma(this)">-</button>
+				</div>
+			</div>
+			<button type="button" onclick="adicionarArma()">+</button>
+		</div>
+	</div>
+	<div class="panel" id="save">
+		<button type="button" onclick="salvarFicha()">💾 Salvar Ficha</button>
+		<button type="button" onclick="carregarFicha()">📂 Carregar Ficha</button>
+	</div>
+
+<div class="vinheta" id="vinhetaDano"></div>
+
+<!--Script aqui ó-->
+
+<script>
+
+
+
+const clickSound = new Audio('clique.mp3');
+
+function playClick() {
+	clickSound.currentTime = 0;
+	clickSound.play();
+}
+// Adiciona som a todos os botões exceto rolagem de dados
+document.querySelectorAll("button:not(.dice-button)").forEach(btn => {
+	btn.addEventListener("click", playClick);
+});
+const input = document.getElementById('supremaInput');
+const circle = document.getElementById('supremaCircle');
+input.addEventListener('input', () => {
+	let val = parseInt(input.value);
+	val = Math.min(100, Math.max(0, val));
+	circle.textContent = val + '%';
+	circle.style.background = `conic-gradient(var(--highlight) ${val * 3.6}deg, #333 ${val * 3.6}deg)`;
+
+	if (val === 100) {
+		circle.classList.add('ativavel');
+		circle.setAttribute('title', 'Clique para ativar a suprema!');
+		circle.onclick = ativarSuprema;
+	} else {
+		circle.classList.remove('ativavel');
+		circle.removeAttribute('title');
+		circle.onclick = null;
+	}
+});
+
+
+function toggleTheme() {
+	const body = document.body;
+	const botao = document.getElementById("temaBtn");
+	body.classList.toggle('light');
+	if (body.classList.contains('light')) {
+		botao.innerText = "☀️ Tema Claro";
+	} else {
+		botao.innerText = "🌙 Tema Escuro";
+	}
+}
+
+function showTab(id) {
+	document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+	document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+	document.querySelector(`.tab-button[onclick*="${id}"]`).classList.add('active');
+	document.getElementById(id).classList.add('active');
+}
+
+function adicionarHabilidade() {
+	const container = document.getElementById('habilidadesContainer');
+	const nova = document.createElement('div');
+	nova.classList.add('habilidade');
+	nova.innerHTML = `
+		    <label>Nome da Habilidade:
+		      <input type="text" placeholder="Nome da habilidade">
+		    </label>
+		    <label>Descrição da Habilidade:
+		      <textarea placeholder="Descrição detalhada da habilidade."></textarea>
+		    </label>
+		    <label>Cooldown (em turnos):
+		      <input type="number" placeholder="Cooldown">
+		    </label>
+		    <button type="button" onclick="removerHabilidade(this)">-</button>
+		  `;
+	container.appendChild(nova);
+}
+
+function removerHabilidade(botao) {
+	const habilidade = botao.parentElement;
+	habilidade.remove();
+}
+
+function adicionarArma() {
+	const container = document.getElementById('armasContainer');
+	const nova = document.createElement('div');
+	nova.classList.add('arma');
+	nova.innerHTML = `
+		    <label>Nome da Arma:
+		      <input type="text" placeholder="Nome da arma">
+		    </label>
+		    <label>Dano (ex: 1d6, 2d8):
+		      <input type="text" placeholder="Dano da arma">
+		    </label>
+		    <label>Tipo de Dano:
+		      <select>
+		        <option>Melee</option>
+		        <option>Feixe</option>
+		        <option>Hitscan</option>
+		        <option>Projétil</option>
+		      </select>
+		    </label>
+		    <label>Efeitos Especiais:
+		      <textarea placeholder="Descreva efeitos adicionais, se houver."></textarea>
+		    </label>
+		    <button type="button" onclick="removerArma(this)">-</button>
+		  `;
+	container.appendChild(nova);
+}
+
+function removerArma(botao) {
+	const arma = botao.parentElement;
+	arma.remove();
+}
+
+function parseNotacaoCompleta(notacao) {
+  const match = notacao.trim().match(/(\d*)d(\d+)([+-]\d+)?/i);
+  if (!match) return null;
+
+  const qtd = parseInt(match[1]) || 1;
+  const faces = parseInt(match[2]);
+  const mod = parseInt(match[3]) || 0;
+
+  return { qtd, faces, mod };
+}
+
+function rolarDadoCustomizado() {
+  const input = document.getElementById("inputNotacaoDado");
+  const notacao = input.value;
+
+  const dados = parseNotacaoCompleta(notacao);
+  if (!dados) {
+    alert("Formato inválido. Use algo como 2d8+1");
+    return;
+  }
+
+  const { qtd, faces, mod } = dados;
+  const resultados = [];
+  const emojis = { 1: '⚀', 2: '⚁', 3: '⚂', 4: '⚃', 5: '⚄', 6: '⚅' };
+
+  const resultDiv = document.getElementById("dice-result");
+  resultDiv.innerHTML = `<span class="dice-face">🎲</span>`;
+
+  setTimeout(() => {
+    let total = 0;
+    let resultHTML = '';
+
+    for (let i = 0; i < qtd; i++) {
+      const res = Math.floor(Math.random() * faces) + 1;
+      resultados.push(res);
+      total += res;
+
+      if (faces === 6) {
+        resultHTML += `<span class="dice-face">${emojis[res]}</span> `;
+      } else {
+        resultHTML += `<span class="dice-face">${res}</span> `;
+      }
+    }
+
+    total += mod;
+    const modTexto = mod !== 0 ? ` ${mod > 0 ? '+' : '-'} ${Math.abs(mod)}` : '';
+    const valoresTexto = resultados.join(" + ");
+	const expressao = `${valoresTexto}${modTexto ? ` ${modTexto}` : ''} = ${total}`;
+	resultDiv.innerHTML = `<span class="dice-face">${expressao}</span>`;
+
+
+    const log = document.getElementById("diceLog");
+    const entry = document.createElement("div");
+    entry.textContent = `Rolou ${notacao}: ${resultados.join(" + ")}${modTexto} = ${total}`;
+    log.prepend(entry);
+  }, 600);
+}
+
+function salvarFicha() {
+  // Pega os dados básicos
+  const nome = document.querySelector('input[placeholder="Ex: Echo"]').value;
+  const associacao = document.querySelectorAll('select')[0].value;
+  const classe = document.querySelectorAll('select')[1].value;
+
+  // Atributos
+  const atributos = {
+    vigor: parseInt(document.getElementById('vigor').value) || 0,
+    mobilidade: parseInt(document.getElementById('mobilidade').value) || 0,
+    tecnica: parseInt(document.getElementById('tecnica').value) || 0,
+    espirito: parseInt(document.getElementById('espirito').value) || 0,
+    presenca: parseInt(document.getElementById('presenca').value) || 0,
+  };
+
+  // Suprema
+  const suprema = parseInt(document.getElementById('supremaInput').value) || 0;
+
+  // Dados pessoais
+  const pessoal = {
+    nomeCompleto: document.querySelector('input[placeholder="Ex: Jack Morison"]').value,
+    codinome: document.querySelector('input[placeholder="Ex: Soldier: 76"]').value,
+    idade: document.querySelector('input[placeholder="Idade"]').value,
+    nascimento: {
+      dia: document.querySelector('input[placeholder="Dia"]').value,
+      mes: document.querySelector('input[placeholder="Mês"]').value,
+      ano: document.querySelector('input[placeholder="Ano"]').value,
+    },
+    nacionalidade: document.querySelector('input[placeholder="Ex: Estados Unidos"]').value,
+    afiliados: document.querySelector('input[placeholder="Ex: Ana, Gabriel Reyes, Overwatch"]').value,
+    historia: document.querySelector('#pessoal textarea').value
+  };
+
+  // Habilidades - pegar todas as divs .habilidade e montar array
+  const habilidades = Array.from(document.querySelectorAll('#habilidadesContainer .habilidade')).map(div => {
+    return {
+      nome: div.querySelector('input[type="text"]').value,
+      descricao: div.querySelector('textarea').value,
+      cooldown: parseInt(div.querySelector('input[type="number"]').value) || 0
+    };
+  });
+
+  // Inventário
+  const inventario = document.querySelector('#equipamento textarea').value;
+
+  // Armas - pegar todas as divs .arma e montar array
+  const armas = Array.from(document.querySelectorAll('#armasContainer .arma')).map(div => {
+    return {
+      nome: div.querySelector('input[type="text"]').value,
+      dano: div.querySelectorAll('input[type="text"]')[1].value, // segundo input text é dano
+      tipo: div.querySelector('select').value,
+      efeitos: div.querySelector('textarea').value
+    };
+  });
+
+  // Monta o objeto
+  const ficha = {
+  nome,
+  associacao,
+  classe,
+  atributos,
+  suprema,
+  pessoal,
+  habilidades,
+  inventario,
+  armas,
+  vida: {
+    atual: vidaAtual,
+    armadura: armaduraAtual,
+    escudo: escudoAtual,
+    vidaExtra: vidaExtraAtual,
+    maxima: parseInt(vidaMaximaInput.value) || 0,
+    armaduraMax: parseInt(armaduraMaxInput.value) || 0,
+    escudoMax: parseInt(escudoMaxInput.value) || 0
+  }
+};
+
+
+  // Transforma em JSON e baixa o arquivo
+  const json = JSON.stringify(ficha, null, 2);
+  const blob = new Blob([json], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `${nome || "ficha"}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+
+//Função de carregar a ficha ---------------------------------------------------------------------------
+function carregarFicha() {
+	const input = document.createElement("input");
+	input.type = "file";
+	input.accept = "application/json";
+	input.onchange = (e) => {
+		const file = e.target.files[0];
+		if (!file) return;
+		const reader = new FileReader();
+		reader.onload = (e) => {
+			const data = JSON.parse(e.target.result);
+			document.querySelector('input[placeholder="Ex: Echo"]').value = data.nome || "";
+			document.querySelectorAll('select')[0].value = data.associacao || "";
+			document.querySelectorAll('select')[1].value = data.classe || "";
+			document.getElementById('vigor').value = data.atributos?.vigor || 0;
+			document.getElementById('mobilidade').value = data.atributos?.mobilidade || 0;
+			document.getElementById('tecnica').value = data.atributos?.tecnica || 0;
+			document.getElementById('espirito').value = data.atributos?.espirito || 0;
+			document.getElementById('presenca').value = data.atributos?.presenca || 0;
+			document.getElementById('supremaInput').value = data.suprema || 0;
+			document.getElementById('supremaInput').dispatchEvent(new Event('input'));
+			document.querySelector('input[placeholder="Ex: Jack Morison"]').value = data.pessoal?.nomeCompleto || "";
+			document.querySelector('input[placeholder="Ex: Soldier: 76"]').value = data.pessoal?.codinome || "";
+			document.querySelector('input[placeholder="Idade"]').value = data.pessoal?.idade || "";
+			document.querySelector('input[placeholder="Dia"]').value = data.pessoal?.nascimento?.dia || "";
+			document.querySelector('input[placeholder="Mês"]').value = data.pessoal?.nascimento?.mes || "";
+			document.querySelector('input[placeholder="Ano"]').value = data.pessoal?.nascimento?.ano || "";
+			document.querySelector('input[placeholder="Ex: Estados Unidos"]').value = data.pessoal?.nacionalidade || "";
+			document.querySelector('input[placeholder="Ex: Ana, Gabriel Reyes, Overwatch"]').value = data.pessoal?.afiliados || "";
+			document.querySelector('#pessoal textarea').value = data.pessoal?.historia || "";
+			const habilidadesContainer = document.getElementById('habilidadesContainer');
+			habilidadesContainer.innerHTML = "";
+			(data.habilidades || []).forEach(h => {
+				const div = document.createElement('div');
+				div.classList.add('habilidade');
+				div.innerHTML = `
+		        <label>Nome da Habilidade:<input type="text" value="${h.nome || ""}"></label>
+		        <label>Descrição da Habilidade:<textarea>${h.descricao || ""}</textarea></label>
+		        <label>Cooldown (em turnos):<input type="number" value="${h.cooldown || 0}"></label>
+		        <button type="button" onclick="removerHabilidade(this)">-</button>
+		      `;
+				habilidadesContainer.appendChild(div);
+			});
+			document.querySelector('#equipamento textarea').value = data.inventario || "";
+			const armasContainer = document.getElementById('armasContainer');
+			armasContainer.innerHTML = "";
+			(data.armas || []).forEach(a => {
+				const div = document.createElement('div');
+				div.classList.add('arma');
+				div.innerHTML = `
+		        <label>Nome da Arma:
+		          <input type="text" value="${a.nome || ""}">
+		        </label>
+		        <label>Dano (ex: 1d6, 2d8):
+		          <input type="text" value="${a.dano || ""}">
+		        </label>
+		        <label>Tipo de Dano:
+		          <select>
+		            <option ${a.tipo === "Melee" ? "selected" : ""}>Melee</option>
+		            <option ${a.tipo === "Feixe" ? "selected" : ""}>Feixe</option>
+		            <option ${a.tipo === "Hitscan" ? "selected" : ""}>Hitscan</option>
+		            <option ${a.tipo === "Projétil" ? "selected" : ""}>Projétil</option>
+		          </select>
+		        </label>
+		        <label>Efeitos Especiais:
+		          <textarea>${a.efeitos || ""}</textarea>
+		        </label>
+		        <button type="button" onclick="removerArma(this)">-</button>
+		      `;
+				armasContainer.appendChild(div);
+			});
+			if (data.vida) {
+  vidaAtual = data.vida.atual || 0;
+  armaduraAtual = data.vida.armadura || 0;
+  escudoAtual = data.vida.escudo || 0;
+  vidaExtraAtual = data.vida.vidaExtra || 0;
+
+  vidaMaximaInput.value = data.vida.maxima || 0;
+  armaduraMaxInput.value = data.vida.armaduraMax || 0;
+  escudoMaxInput.value = data.vida.escudoMax || 0;
+
+  atualizarBarraDeVida();
+  atualizarVinheta();
+}
+
+		};
+		reader.readAsText(file);
+	};
+
+input.click();
+}
+
+// Vida e Vinheta -------------------------------------------------------------------------------------
+const vidaMaximaInput = document.getElementById("vidaMaxima");
+const armaduraMaxInput = document.getElementById("armaduraMax");
+const escudoMaxInput = document.getElementById("escudoMax");
+const barraDeVida = document.getElementById("barraDeVida");
+
+let vidaAtual = 0;
+let armaduraAtual = 0;
+let escudoAtual = 0;
+let vidaExtraAtual = 0;
+
+
+function inicializarValores() {
+  const vidaMax = parseInt(vidaMaximaInput.value) || 0;
+  const armaduraMax = parseInt(armaduraMaxInput.value) || 0;
+  const escudoMax = parseInt(escudoMaxInput.value) || 0;
+  const vidaBase = vidaMax - armaduraMax - escudoMax;
+
+  vidaAtual = vidaBase;
+  armaduraAtual = armaduraMax;
+  escudoAtual = escudoMax;
+  vidaExtraAtual = 0;
+
+
+  atualizarBarraDeVida();
+}
+
+vidaMaximaInput.addEventListener("input", inicializarValores);
+armaduraMaxInput.addEventListener("input", inicializarValores);
+escudoMaxInput.addEventListener("input", inicializarValores);
+
+function aplicarDanoComValor() {
+  const valor = parseInt(document.getElementById("valorModificador").value) || 0;
+  if (valor > 0) aplicarDano(valor);
+}
+
+function curarComValor() {
+  const valor = parseInt(document.getElementById("valorModificador").value) || 0;
+  if (valor > 0) curar(valor);
+}
+
+
+function atualizarBarraDeVida() {
+  const vidaMax = parseInt(vidaMaximaInput.value) || 0;
+  const armaduraMax = parseInt(armaduraMaxInput.value) || 0;
+  const escudoMax = parseInt(escudoMaxInput.value) || 0;
+  const vidaBase = vidaMax - armaduraMax - escudoMax;
+
+  barraDeVida.innerHTML = "";
+
+  // VIDA NORMAL
+  for (let i = 0; i < vidaBase; i++) {
+    const div = document.createElement("div");
+    div.classList.add("vida-quadrado");
+    div.classList.add(i < vidaAtual ? "vida-normal" : "vida-perdida");
+    barraDeVida.appendChild(div);
+  }
+
+  // ARMADURA
+  for (let i = 0; i < armaduraMax; i++) {
+    const div = document.createElement("div");
+    div.classList.add("vida-quadrado");
+    div.classList.add(i < armaduraAtual ? "vida-armadura" : "vida-perdida");
+    barraDeVida.appendChild(div);
+  }
+
+  // ESCUDO
+  for (let i = 0; i < escudoMax; i++) {
+    const div = document.createElement("div");
+    div.classList.add("vida-quadrado");
+    div.classList.add(i < escudoAtual ? "vida-escudo" : "vida-perdida");
+    barraDeVida.appendChild(div);
+  }
+    // VIDA EXTRA
+  for (let i = 0; i < vidaExtraAtual; i++) {
+    const div = document.createElement("div");
+    div.classList.add("vida-quadrado", "vida-extra");
+    barraDeVida.appendChild(div);
+  }
+
+
+}
+
+function aplicarDano(dano) {
+  let restante = dano;
+
+  if (vidaExtraAtual > 0) {
+    const usado = Math.min(vidaExtraAtual, restante);
+    vidaExtraAtual -= usado;
+    restante -= usado;
+  }
+
+  if (restante > 0 && escudoAtual > 0) {
+    const usado = Math.min(escudoAtual, restante);
+    escudoAtual -= usado;
+    restante -= usado;
+  }
+  if (restante > 0 && armaduraAtual > 0) {
+    const usado = Math.min(armaduraAtual, restante);
+    armaduraAtual -= usado;
+    restante -= usado;
+  }
+  if (restante > 0 && vidaAtual > 0) {
+    const usado = Math.min(vidaAtual, restante);
+    vidaAtual -= usado;
+    restante -= usado;
+  }
+
+  atualizarBarraDeVida();
+  atualizarVinheta();
+}
+
+
+function curar(cura) {
+  const vidaMax = parseInt(vidaMaximaInput.value) || 0;
+  const armaduraMax = parseInt(armaduraMaxInput.value) || 0;
+  const escudoMax = parseInt(escudoMaxInput.value) || 0;
+  const vidaBase = vidaMax - armaduraMax - escudoMax;
+
+  let restante = cura;
+
+  const vidaFalta = vidaBase - vidaAtual;
+  const armaduraFalta = armaduraMax - armaduraAtual;
+  const escudoFalta = escudoMax - escudoAtual;
+
+  if (vidaFalta > 0) {
+    const usado = Math.min(vidaFalta, restante);
+    vidaAtual += usado;
+    restante -= usado;
+  }
+  if (restante > 0 && armaduraFalta > 0) {
+    const usado = Math.min(armaduraFalta, restante);
+    armaduraAtual += usado;
+    restante -= usado;
+  }
+  if (restante > 0 && escudoFalta > 0) {
+    const usado = Math.min(escudoFalta, restante);
+    escudoAtual += usado;
+    restante -= usado;
+  }
+  if (restante > 0) {
+  vidaExtraAtual += restante;
+}
+
+
+  atualizarBarraDeVida();
+  atualizarVinheta();
+}
+
+document.addEventListener("DOMContentLoaded", inicializarValores, atualizarVinheta);
+
+function atualizarVinheta() {
+  const vinheta = document.getElementById('vinhetaDano');
+  const vidaMax = parseInt(vidaMaximaInput.value) || 0;
+  const armaduraMax = parseInt(armaduraMaxInput.value) || 0;
+  const escudoMax = parseInt(escudoMaxInput.value) || 0;
+  const vidaBase = vidaMax - armaduraMax - escudoMax;
+
+  const porcentagem = vidaAtual / vidaBase;
+
+  if (porcentagem < 0.6) {
+    const intensidade = (1 - porcentagem) * 0.9;
+    vinheta.style.opacity = intensidade.toFixed(2);
+  } else {
+    vinheta.style.opacity = 0;
+  }
+}
+
+//Suprema -----------------------------------------------------------------------------
+function ativarSuprema() {
+	console.log("Suprema ativada!");
+	// Efeito sonoro (opcional)
+	const somSuprema = new Audio('suprema.mp3'); // coloque o arquivo certo aí
+	somSuprema.play();
+
+	// Efeito visual (temporário)
+	circle.classList.add('explodindo');
+	setTimeout(() => {
+		circle.classList.remove('explodindo');
+	}, 800);
+
+	// Resetar valor
+	input.value = 0;
+	input.dispatchEvent(new Event('input'));
+}
+
+ </script>
+
+</body>
+
+</html>
