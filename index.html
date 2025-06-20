@@ -86,13 +86,31 @@
     </div>
 </div>
     <div class="panel">
-      <h2>Suprema</h2>
-      <div class="circle-wrapper">
-        <div class="circle" id="supremaCircle">0%</div>
-      </div>
-      <label>Carga da Suprema (%) <input type="number" id="supremaInput" min="0" max="100" value="0">
-      </label>
-    </div>
+  <h2>
+    Suprema
+    <button class="suprema-toggle" onclick="toggleSupremaInfo()">▼</button>
+  </h2>
+
+  <div class="circle-wrapper">
+    <div class="circle" id="supremaCircle">0%</div>
+  </div>
+
+  <label>
+    Carga da Suprema (%)
+    <input type="number" id="supremaInput" min="0" max="100" value="0">
+  </label>
+
+  <div class="suprema-info" id="supremaInfo">
+    <label>Nome da Suprema:
+      <input type="text" placeholder="Nome da habilidade suprema">
+    </label>
+    <label>Descrição:
+      <textarea placeholder="Descreva o efeito da habilidade..."></textarea>
+    </label>
+  </div>
+</div>
+
+
     <div class="panel dice-panel">
   <h2>Rolar Dados</h2>
   <div id="dice-result" class="dice-result">🎲</div>
@@ -115,7 +133,7 @@
 			<h2>Informações do agente</h2>
 			<label>Nome completo: <input type="text" placeholder="Ex: Jack Morison" />
 			</label>
-			<label>Apelido ou codinome: <input type="text" placeholder="Ex: Soldier: 76" />
+			<label>Apelido ou codinome: <input type="text" placeholder="Ex: Soldado: 76" />
 			</label>
 			<label>Idade: <input type="number" placeholder="Idade" min="0" />
 			</label>
@@ -387,7 +405,7 @@ function salvarFicha() {
   // Dados pessoais
   const pessoal = {
     nomeCompleto: document.querySelector('input[placeholder="Ex: Jack Morison"]').value,
-    codinome: document.querySelector('input[placeholder="Ex: Soldier: 76"]').value,
+    codinome: document.querySelector('input[placeholder="Ex: Soldado: 76"]').value,
     idade: document.querySelector('input[placeholder="Idade"]').value,
     nascimento: {
       dia: document.querySelector('input[placeholder="Dia"]').value,
@@ -399,7 +417,7 @@ function salvarFicha() {
     historia: document.querySelector('#pessoal textarea').value
   };
 
-  // Habilidades - pegar todas as divs .habilidade e montar array
+  // Habilidades - pega todas as divs .habilidade e monta array
   const habilidades = Array.from(document.querySelectorAll('#habilidadesContainer .habilidade')).map(div => {
     return {
       nome: div.querySelector('input[type="text"]').value,
@@ -428,6 +446,10 @@ function salvarFicha() {
   classe,
   atributos,
   suprema,
+  supremaDados: {
+  nome: document.querySelector('#supremaInfo input')?.value || "",
+  descricao: document.querySelector('#supremaInfo textarea')?.value || ""
+  },
   pessoal,
   habilidades,
   inventario,
@@ -456,7 +478,6 @@ function salvarFicha() {
   URL.revokeObjectURL(url);
 }
 
-
 //Função de carregar a ficha ---------------------------------------------------------------------------
 function carregarFicha() {
 	const input = document.createElement("input");
@@ -478,6 +499,10 @@ function carregarFicha() {
 			document.getElementById('presenca').value = data.atributos?.presenca || 0;
 			document.getElementById('supremaInput').value = data.suprema || 0;
 			document.getElementById('supremaInput').dispatchEvent(new Event('input'));
+			if (data.supremaDados) {
+				document.querySelector('#supremaInfo input').value = data.supremaDados.nome || "";
+				document.querySelector('#supremaInfo textarea').value = data.supremaDados.descricao || "";
+			}
 			document.querySelector('input[placeholder="Ex: Jack Morison"]').value = data.pessoal?.nomeCompleto || "";
 			document.querySelector('input[placeholder="Ex: Soldier: 76"]').value = data.pessoal?.codinome || "";
 			document.querySelector('input[placeholder="Idade"]').value = data.pessoal?.idade || "";
@@ -548,7 +573,7 @@ function carregarFicha() {
 
 input.click();
 }
-
+ 
 // Vida e Vinheta -------------------------------------------------------------------------------------
 const vidaMaximaInput = document.getElementById("vidaMaxima");
 const armaduraMaxInput = document.getElementById("armaduraMax");
@@ -733,6 +758,10 @@ function ativarSuprema() {
 	// Resetar valor
 	input.value = 0;
 	input.dispatchEvent(new Event('input'));
+}
+function toggleSupremaInfo() {
+  const info = document.getElementById('supremaInfo');
+  info.classList.toggle('show');
 }
 
  </script>
