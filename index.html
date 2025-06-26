@@ -29,6 +29,11 @@
 		<form class="panel">
 			<label>Nome do Personagem: <input type="text" placeholder="Ex: Echo" />
 			</label>
+			<label>Foto do Personagem:
+				<input type="file" accept="image/*" onchange="carregarImagem(this, 'imagemPreview')">
+			</label>
+			<img id="imagemPreview" src="" alt="Foto do personagem" style="max-width: 200px; display: block;">
+
 			<label>Associação: <select>
 					<option>Nenhuma/Civil</option>
 					<option>Overwatch</option>
@@ -163,6 +168,12 @@
 					</label>
 					<label>Descrição da Habilidade: <textarea placeholder="Descrição detalhada da habilidade"></textarea>
 					</label>
+					<label>Tipo:
+						<select>
+							<option value="ativa">Ativa</option>
+							<option value="passiva">Passiva</option>
+						</select>
+					</label>
 					<label>Cooldown (em turnos): <input type="number" placeholder="Cooldown">
 					</label>
 					<button type="button" onclick="removerHabilidade(this)">-</button>
@@ -171,6 +182,12 @@
 					<label>Nome da Habilidade: <input type="text" placeholder="Nome da habilidade">
 					</label>
 					<label>Descrição da Habilidade: <textarea placeholder="Descrição detalhada da habilidade."></textarea>
+					</label>
+					<label>Tipo:
+						<select>
+							<option value="ativa">Ativa</option>
+							<option value="passiva">Passiva</option>
+						</select>
 					</label>
 					<label>Cooldown (em turnos): <input type="number" placeholder="Cooldown">
 					</label>
@@ -220,7 +237,17 @@
 
 <script>
 
+const vidaMaximaInput = document.getElementById("vidaMaxima");
+const armaduraMaxInput = document.getElementById("armaduraMax");
+const escudoMaxInput = document.getElementById("escudoMax");
+const barraDeVida = document.getElementById("barraDeVida");
 
+let vidaAtual = 0;
+let armaduraAtual = 0;
+let escudoAtual = 0;
+let vidaExtraAtual = 0;
+
+document.addEventListener("DOMContentLoaded", inicializarValores, atualizarVinheta);
 
 const clickSound = new Audio('clique.mp3');
 
@@ -275,17 +302,23 @@ function adicionarHabilidade() {
 	const nova = document.createElement('div');
 	nova.classList.add('habilidade');
 	nova.innerHTML = `
-		    <label>Nome da Habilidade:
-		      <input type="text" placeholder="Nome da habilidade">
-		    </label>
-		    <label>Descrição da Habilidade:
-		      <textarea placeholder="Descrição detalhada da habilidade."></textarea>
-		    </label>
-		    <label>Cooldown (em turnos):
-		      <input type="number" placeholder="Cooldown">
-		    </label>
-		    <button type="button" onclick="removerHabilidade(this)">-</button>
-		  `;
+		<label>Nome da Habilidade:
+			<input type="text" placeholder="Nome da habilidade">
+		</label>
+		<label>Descrição da Habilidade:
+			<textarea placeholder="Descrição detalhada da habilidade."></textarea>
+		</label>
+		<label>Tipo:
+			<select>
+				<option value="ativa">Ativa</option>
+				<option value="passiva">Passiva</option>
+			</select>
+		</label>
+		<label>Cooldown (em turnos):
+			<input type="number" placeholder="Cooldown">
+		</label>
+		<button type="button" onclick="removerHabilidade(this)">-</button>
+	`;
 	container.appendChild(nova);
 }
 
@@ -418,13 +451,16 @@ function salvarFicha() {
   };
 
   // Habilidades - pega todas as divs .habilidade e monta array
-  const habilidades = Array.from(document.querySelectorAll('#habilidadesContainer .habilidade')).map(div => {
-    return {
-      nome: div.querySelector('input[type="text"]').value,
-      descricao: div.querySelector('textarea').value,
-      cooldown: parseInt(div.querySelector('input[type="number"]').value) || 0
-    };
-  });
+	const habilidades = Array.from(document.querySelectorAll('#habilidadesContainer .habilidade')).map(div => {
+		const inputs = div.querySelectorAll('input, textarea, select');
+		return {
+			nome: inputs[0].value,
+			descricao: inputs[1].value,
+			tipo: inputs[2].value,
+			cooldown: parseInt(inputs[3].value) || 0
+		};
+	});
+
 
   // Inventário
   const inventario = document.querySelector('#equipamento textarea').value;
@@ -442,6 +478,7 @@ function salvarFicha() {
   // Monta o objeto
   const ficha = {
   nome,
+  imagem: document.getElementById('imagemPreview').dataset.base64 || "",
   associacao,
   classe,
   atributos,
@@ -483,109 +520,158 @@ function carregarFicha() {
 	const input = document.createElement("input");
 	input.type = "file";
 	input.accept = "application/json";
+
 	input.onchange = (e) => {
 		const file = e.target.files[0];
 		if (!file) return;
+
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			const data = JSON.parse(e.target.result);
-			document.querySelector('input[placeholder="Ex: Echo"]').value = data.nome || "";
-			document.querySelectorAll('select')[0].value = data.associacao || "";
-			document.querySelectorAll('select')[1].value = data.classe || "";
-			document.getElementById('vigor').value = data.atributos?.vigor || 0;
-			document.getElementById('mobilidade').value = data.atributos?.mobilidade || 0;
-			document.getElementById('tecnica').value = data.atributos?.tecnica || 0;
-			document.getElementById('espirito').value = data.atributos?.espirito || 0;
-			document.getElementById('presenca').value = data.atributos?.presenca || 0;
-			document.getElementById('supremaInput').value = data.suprema || 0;
-			document.getElementById('supremaInput').dispatchEvent(new Event('input'));
-			if (data.supremaDados) {
-				document.querySelector('#supremaInfo input').value = data.supremaDados.nome || "";
-				document.querySelector('#supremaInfo textarea').value = data.supremaDados.descricao || "";
+
+			// Campos básicos
+			const nomeInput = document.querySelector('input[placeholder="Ex: Echo"]');
+			if (nomeInput) nomeInput.value = data.nome || "";
+
+			if (data.imagem) {
+				const img = document.getElementById('imagemPreview');
+			if (img) {
+				img.src = data.imagem;
+				img.dataset.base64 = data.imagem;
 			}
-			document.querySelector('input[placeholder="Ex: Jack Morison"]').value = data.pessoal?.nomeCompleto || "";
-			document.querySelector('input[placeholder="Ex: Soldier: 76"]').value = data.pessoal?.codinome || "";
-			document.querySelector('input[placeholder="Idade"]').value = data.pessoal?.idade || "";
-			document.querySelector('input[placeholder="Dia"]').value = data.pessoal?.nascimento?.dia || "";
-			document.querySelector('input[placeholder="Mês"]').value = data.pessoal?.nascimento?.mes || "";
-			document.querySelector('input[placeholder="Ano"]').value = data.pessoal?.nascimento?.ano || "";
-			document.querySelector('input[placeholder="Ex: Estados Unidos"]').value = data.pessoal?.nacionalidade || "";
-			document.querySelector('input[placeholder="Ex: Ana, Gabriel Reyes, Overwatch"]').value = data.pessoal?.afiliados || "";
-			document.querySelector('#pessoal textarea').value = data.pessoal?.historia || "";
+			}
+
+
+			const selects = document.querySelectorAll('select');
+			if (selects[0]) selects[0].value = data.associacao || "";
+			if (selects[1]) selects[1].value = data.classe || "";
+
+			// Atributos
+			const setAttr = (id, val) => {
+				const el = document.getElementById(id);
+				if (el) el.value = val || 0;
+			};
+			setAttr('vigor', data.atributos?.vigor);
+			setAttr('mobilidade', data.atributos?.mobilidade);
+			setAttr('tecnica', data.atributos?.tecnica);
+			setAttr('espirito', data.atributos?.espirito);
+			setAttr('presenca', data.atributos?.presenca);
+
+			// Suprema (gatilha criação dinâmica!)
+			const supremaInput = document.getElementById('supremaInput');
+			if (supremaInput) {
+				supremaInput.value = data.suprema || 0;
+				supremaInput.dispatchEvent(new Event('input'));
+
+				setTimeout(() => {
+					if (data.supremaDados) {
+						const nome = document.querySelector('#supremaInfo input');
+						const desc = document.querySelector('#supremaInfo textarea');
+						if (nome) nome.value = data.supremaDados.nome || "";
+						if (desc) desc.value = data.supremaDados.descricao || "";
+					}
+				}, 50);
+			}
+
+			// Dados pessoais
+			const safeSet = (selector, val) => {
+				const el = document.querySelector(selector);
+				if (el) el.value = val || "";
+			};
+
+			safeSet('input[placeholder="Ex: Jack Morison"]', data.pessoal?.nomeCompleto);
+			safeSet('input[placeholder="Ex: Soldado: 76"]', data.pessoal?.codinome);
+			safeSet('input[placeholder="Idade"]', data.pessoal?.idade);
+			safeSet('input[placeholder="Dia"]', data.pessoal?.nascimento?.dia);
+			safeSet('input[placeholder="Mês"]', data.pessoal?.nascimento?.mes);
+			safeSet('input[placeholder="Ano"]', data.pessoal?.nascimento?.ano);
+			safeSet('input[placeholder="Ex: Estados Unidos"]', data.pessoal?.nacionalidade);
+			safeSet('input[placeholder="Ex: Ana, Gabriel Reyes, Overwatch"]', data.pessoal?.afiliados);
+			
+			const historia = document.querySelector('#pessoal textarea');
+			if (historia) historia.value = data.pessoal?.historia || "";
+
+			// Habilidades
 			const habilidadesContainer = document.getElementById('habilidadesContainer');
-			habilidadesContainer.innerHTML = "";
-			(data.habilidades || []).forEach(h => {
+			if (habilidadesContainer) {
+				habilidadesContainer.innerHTML = "";
+				(data.habilidades || []).forEach(h => {
 				const div = document.createElement('div');
 				div.classList.add('habilidade');
 				div.innerHTML = `
-		        <label>Nome da Habilidade:<input type="text" value="${h.nome || ""}"></label>
-		        <label>Descrição da Habilidade:<textarea>${h.descricao || ""}</textarea></label>
-		        <label>Cooldown (em turnos):<input type="number" value="${h.cooldown || 0}"></label>
-		        <button type="button" onclick="removerHabilidade(this)">-</button>
-		      `;
+					<label>Nome da Habilidade:
+						<input type="text" value="${h.nome || ""}">
+					</label>
+					<label>Descrição da Habilidade:
+						<textarea>${h.descricao || ""}</textarea>
+					</label>
+					<label>Tipo:
+						<select>
+							<option value="ativa" ${h.tipo === "ativa" ? "selected" : ""}>Ativa</option>
+							<option value="passiva" ${h.tipo === "passiva" ? "selected" : ""}>Passiva</option>
+						</select>
+					</label>
+					<label>Cooldown (em turnos):
+						<input type="number" value="${h.cooldown || 0}">
+					</label>
+					<button type="button" onclick="removerHabilidade(this)">-</button>
+				`;
 				habilidadesContainer.appendChild(div);
 			});
-			document.querySelector('#equipamento textarea').value = data.inventario || "";
+			}
+
+			// Equipamento
+			const equipamento = document.querySelector('#equipamento textarea');
+			if (equipamento) equipamento.value = data.inventario || "";
+
+			// Armas
 			const armasContainer = document.getElementById('armasContainer');
-			armasContainer.innerHTML = "";
-			(data.armas || []).forEach(a => {
-				const div = document.createElement('div');
-				div.classList.add('arma');
-				div.innerHTML = `
-		        <label>Nome da Arma:
-		          <input type="text" value="${a.nome || ""}">
-		        </label>
-		        <label>Dano (ex: 1d6, 2d8):
-		          <input type="text" value="${a.dano || ""}">
-		        </label>
-		        <label>Tipo de Dano:
-		          <select>
-		            <option ${a.tipo === "Melee" ? "selected" : ""}>Melee</option>
-		            <option ${a.tipo === "Feixe" ? "selected" : ""}>Feixe</option>
-		            <option ${a.tipo === "Hitscan" ? "selected" : ""}>Hitscan</option>
-		            <option ${a.tipo === "Projétil" ? "selected" : ""}>Projétil</option>
-		          </select>
-		        </label>
-		        <label>Efeitos Especiais:
-		          <textarea>${a.efeitos || ""}</textarea>
-		        </label>
-		        <button type="button" onclick="removerArma(this)">-</button>
-		      `;
-				armasContainer.appendChild(div);
-			});
+			if (armasContainer) {
+				armasContainer.innerHTML = "";
+				(data.armas || []).forEach(a => {
+					const div = document.createElement('div');
+					div.classList.add('arma');
+					div.innerHTML = `
+						<label>Nome da Arma:<input type="text" value="${a.nome || ""}"></label>
+						<label>Dano (ex: 1d6, 2d8):<input type="text" value="${a.dano || ""}"></label>
+						<label>Tipo de Dano:
+							<select>
+								<option ${a.tipo === "Melee" ? "selected" : ""}>Melee</option>
+								<option ${a.tipo === "Feixe" ? "selected" : ""}>Feixe</option>
+								<option ${a.tipo === "Hitscan" ? "selected" : ""}>Hitscan</option>
+								<option ${a.tipo === "Projétil" ? "selected" : ""}>Projétil</option>
+							</select>
+						</label>
+						<label>Efeitos Especiais:<textarea>${a.efeitos || ""}</textarea></label>
+						<button type="button" onclick="removerArma(this)">-</button>
+					`;
+					armasContainer.appendChild(div);
+				});
+			}
+
+			// Vida
 			if (data.vida) {
-  vidaAtual = data.vida.atual || 0;
-  armaduraAtual = data.vida.armadura || 0;
-  escudoAtual = data.vida.escudo || 0;
-  vidaExtraAtual = data.vida.vidaExtra || 0;
+				vidaAtual = data.vida.atual || 0;
+				armaduraAtual = data.vida.armadura || 0;
+				escudoAtual = data.vida.escudo || 0;
+				vidaExtraAtual = data.vida.vidaExtra || 0;
 
-  vidaMaximaInput.value = data.vida.maxima || 0;
-  armaduraMaxInput.value = data.vida.armaduraMax || 0;
-  escudoMaxInput.value = data.vida.escudoMax || 0;
+				if (vidaMaximaInput) vidaMaximaInput.value = data.vida.maxima || 0;
+				if (armaduraMaxInput) armaduraMaxInput.value = data.vida.armaduraMax || 0;
+				if (escudoMaxInput) escudoMaxInput.value = data.vida.escudoMax || 0;
 
-  atualizarBarraDeVida();
-  atualizarVinheta();
-}
-
+				atualizarBarraDeVida?.();
+				atualizarVinheta?.();
+			}
 		};
+
 		reader.readAsText(file);
 	};
 
-input.click();
+	input.click();
 }
- 
+
 // Vida e Vinheta -------------------------------------------------------------------------------------
-const vidaMaximaInput = document.getElementById("vidaMaxima");
-const armaduraMaxInput = document.getElementById("armaduraMax");
-const escudoMaxInput = document.getElementById("escudoMax");
-const barraDeVida = document.getElementById("barraDeVida");
-
-let vidaAtual = 0;
-let armaduraAtual = 0;
-let escudoAtual = 0;
-let vidaExtraAtual = 0;
-
-
 function inicializarValores() {
   const vidaMax = parseInt(vidaMaximaInput.value) || 0;
   const armaduraMax = parseInt(armaduraMaxInput.value) || 0;
@@ -723,7 +809,16 @@ function curar(cura) {
   atualizarVinheta();
 }
 
-document.addEventListener("DOMContentLoaded", inicializarValores, atualizarVinheta);
+function carregarImagem(input, idPreview) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    document.getElementById(idPreview).src = reader.result;
+    document.getElementById(idPreview).dataset.base64 = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
 
 function atualizarVinheta() {
   const vinheta = document.getElementById('vinhetaDano');
